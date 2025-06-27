@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>DSA Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-white font-sans">
+  <!-- Navigation Bar -->
+  <div class="flex justify-between items-center p-4 bg-gray-800 shadow">
+    <div class="text-xl font-bold">CodeRoyale</div>
+    <div class="flex items-center space-x-4">
+      <a href="/auth/register" class="hover:underline">Sign Up</a>
+      <a href="/auth/login" class="hover:underline">Login</a>
+      <a href="/auth/logout" class="hover:underline">Logout</a>
+      <div class="w-8 h-8 bg-gray-600 rounded-full flex items-center justify-center">👤</div>
+    </div>
+  </div>
+
+  <div class="flex">
+    <!-- Sidebar -->
+    <div class="w-1/5 bg-gray-800 h-screen p-4">
+      <h2 class="font-semibold mb-4">Quick access</h2>
+      <ul class="space-y-2">
+        <li><a href="#" class="hover:underline">Problems</a></li>
+        <li><a href="#" class="hover:underline">Contest</a></li>
+        <li><a href="/compile" class="hover:underline">Compile</a></li>
+      </ul>
+      <h2 class="font-semibold mt-6 mb-4">My Lists</h2>
+      <ul>
+        <li class="mb-2"><a href="#" class="text-yellow-400">★ Favorite</a></li>
+      </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="w-4/5 p-4">
+      <!-- DSA Topics -->
+      <!-- DSA Topics -->
+    <div class="flex flex-wrap gap-2 mb-6">
+      
+      {% for topic in topics %}
+        <a href="?topic={{ topic.id }}" class="bg-gray-700 hover:bg-gray-600 px-3 py-1 rounded inline-block">{{ topic.name }}</a>
+      {% endfor %}
+
+        </button>
+        </a>
+      
+    </div>
+
+
+      <!-- Search Bar -->
+      <div class="mb-4">
+        <input type="text" placeholder="Search questions..." class="w-full p-2 bg-gray-700 rounded" />
+      </div>
+
+      <!-- Problem List -->
+      <div class="space-y-4">
+        {% for question in questions %}
+          <div class="flex items-center justify-between bg-gray-800 p-3 rounded">
+            <div class="flex items-center space-x-3">
+              <input type="checkbox">
+              <a href="#" class="hover:underline font-semibold">{{ forloop.counter }}. {{ question.title }}</a>
+            </div>
+            <span class="{% if question.difficulty == 'Easy' %}text-green-400
+                          {% elif question.difficulty == 'Medium' %}text-yellow-400
+                          {% else %}text-red-400{% endif %}">
+              {{ question.difficulty }}
+            </span>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</body>
+</html>

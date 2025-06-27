@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en" class="transition duration-300">
+<head>
+    <meta charset="UTF-8">
+    <title>Login | Online Judge</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        function toggleDarkMode() {
+            document.documentElement.classList.toggle('dark');
+        }
+    </script>
+</head>
+<body class="bg-gray-100 dark:bg-gray-900 min-h-screen flex items-center justify-center text-gray-800 dark:text-gray-200 transition duration-300">
+
+    <div class="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-xl w-full max-w-md">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Welcome Back</h2>
+            <button onclick="toggleDarkMode()" class="text-sm px-3 py-1 rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 dark:text-white">
+                🌗 Toggle
+            </button>
+        </div>
+
+        <!-- ✅ Django Messages -->
+        {% if messages %}
+            <ul class="mb-4">
+                {% for message in messages %}
+                    <li class="text-sm px-4 py-2 rounded bg-red-100 text-red-700 dark:bg-red-800 dark:text-red-200 mb-2">
+                        {{ message }}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+
+        <!-- 🔐 Login Form -->
+        <form method="POST">
+            {% csrf_token %}
+
+            <!-- Username -->
+            <div class="mb-4">
+                <label for="username" class="block text-sm font-medium">Username</label>
+                <input type="text" name="username" required
+                    class="mt-1 block w-full px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 rounded-xl focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+            </div>
+
+            <!-- Password -->
+            <div class="mb-6">
+                <label for="password" class="block text-sm font-medium">Password</label>
+                <input type="password" name="password" required
+                    class="mt-1 block w-full px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 rounded-xl">
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit"
+                class="w-full py-2 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl transition duration-200">
+                Login
+            </button>
+        </form>
+
+        <!-- 🧾 Register Link -->
+        <p class="text-sm text-center mt-4">
+            New here?
+            <a href="/auth/register/" class="text-indigo-600 hover:underline">Create an account</a>
+        </p>
+    </div>
+
+</body>
+</html>

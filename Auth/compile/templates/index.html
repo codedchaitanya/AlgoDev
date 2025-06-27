@@ -1,0 +1,26 @@
+<!-- <h1>Code Compiler</h1>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Run Code</button>
+</form> -->
+<h1>Code Compiler</h1>
+<form method="post">
+    {% csrf_token %}
+    
+    <label for="language">Language:</label>
+    <select name="language" id="language" required>
+        <option value="py">Python</option>
+        <option value="c">C</option>
+        <option value="cpp">C++</option>
+    </select>
+    <br><br>
+
+    <label for="code">Code:</label><br>
+    <textarea name="code" rows="10" cols="60" required></textarea><br><br>
+
+    <label for="input_data">Input (optional):</label><br>
+    <textarea name="input_data" rows="5" cols="60"></textarea><br><br>
+
+    <button type="submit">Run Code</button>
+</form>

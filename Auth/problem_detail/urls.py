@@ -1,7 +1,7 @@
 from django.urls import path
-from problem_detail.views import Detail
+from . import views
 
 urlpatterns = [
-    path("detail/", Detail, name="detail"),
-    
+    # path('', views.submit, name='submit'),
+    path('submit/',views.submit,name='submit_question')
 ]

@@ -15,18 +15,26 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
+from django.conf import settings
+from django.conf.urls.static import static
 from django.urls import path,include
 from sign_up.views import home
 from compile.views import submit
 from dashboard.views import dashboard
+# from problem_detail.views import
 
 urlpatterns = [
     path('', home, name='home'),
     path('dashboard/', dashboard, name='dashboard'),
-    path('submit/', submit, name='submit'),
+    # path('compile/', submit, name='submit'),
     path('compile/', include('compile.urls')),
     path('dashboard/', include('dashboard.urls')),
     path("admin/", admin.site.urls),
     path('auth/', include('sign_up.urls')),
-    
+    path('question/<int:id>/', include('problem_detail.urls')),
+    # path('question/<int:id>/', question_detail, name='question_detail'),
 ]
+
+# Serve media files during development
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

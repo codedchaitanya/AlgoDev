@@ -9,7 +9,9 @@ import uuid
 import subprocess
 from pathlib import Path
 from django.contrib.auth.decorators import login_required
+# from django.views.decorators.clickjacking import xframe_options_exempt
 
+# @xframe_options_exempt
 def submit(request):
     if request.method == "POST":
         # Manually fetch form data
@@ -44,7 +46,7 @@ def submit(request):
     return render(request, "index.html", {"form": form}) 
 
 
-@login_required
+# @xframe_options_exempt
 def run_code(language, code, input_data):
     project_path = Path(settings.BASE_DIR)
     directories = ["codes", "inputs", "outputs"]

@@ -1,0 +1,454 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{{ detail.question.title }} | Online Judge</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #1e1e1e;  
+      color: #d4d4d4;
+      display: flex;
+      height: 100vh;
+    }
+
+    .left-panel {
+      width: 40%;
+      padding: 30px;
+      border-right: 1px solid #333;
+      overflow-y: auto;
+    }
+
+    .right-panel {
+      width: 60%;
+      padding: 30px;
+      overflow-y: auto;
+    }
+
+    h1 {
+      color: #ffffff;
+    }
+
+    .tag {
+      display: inline-block;
+      background-color: #2d2d30;
+      color: #c586c0;
+      padding: 5px 10px;
+      margin-right: 10px;
+      border-radius: 5px;
+      font-size: 14px;
+    }
+
+    .section {
+      margin: 20px 0;
+    }
+
+    .section h3 {
+      color: #4ec9b0;
+    }
+
+    .box {
+      background-color: #252526;
+      padding: 10px;
+      border-left: 4px solid #007acc;
+      white-space: pre-wrap;
+      font-family: monospace;
+      color: #dcdcaa;
+    }
+
+    .input-box {
+      background-color: #1e1e1e;
+      color: #ffffff;
+      border: 1px solid #444;
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      font-family: monospace;
+      resize: vertical;
+    }
+
+    .button-group {
+      margin-top: 15px;
+    }
+
+    .btn {
+      padding: 8px 16px;
+      margin-right: 10px;
+      background-color: #007acc;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .btn:hover {
+      background-color: #005f99;
+    }
+
+    .verdict-box {
+      margin-top: 20px;
+      padding: 10px;
+      background-color: #2a2a2a;
+      border-left: 4px solid #4ec9b0;
+    }
+  </style>
+</head>
+<body>
+  <div class="left-panel">
+    <h1>{{ detail.question.title }}</h1>
+
+    <div>
+      <span class="tag">{{ detail.topic.name }}</span>
+      <span class="tag">{{ detail.difficulty }}</span>
+    </div>
+
+    <div class="section">
+      <h3>Description</h3>
+      <p>{{ detail.description }}</p>
+    </div>
+
+      {% if detail.input_file %}
+  <div class="section">
+    <h3>Sample Input</h3>
+    <div class="box">
+      {{ input_content }}
+    </div>
+  </div>
+  {% endif %}
+  
+  {% if detail.output_file %}
+  <div class="section">
+    <h3>Sample Output</h3>
+    <div class="box">
+      {{ output_content }}
+    </div>
+  </div>
+  {% endif %}
+
+
+    {% if detail.explanations %}
+    <div class="section">
+      <h3 style="color:#9cdcfe; margin-top: 10px;">Explanation</h3>
+      <div class="box">{{ detail.explanations }}</div>
+    </div>
+    {% endif %}
+
+    {% if detail.constraints %}
+    <div class="section">
+      <h3 style="color: #f44747;">Constraints</h3>
+      <div class="box">{{ detail.constraints }}</div>
+    </div>
+    {% endif %}
+  </div>
+
+  <div class="right-panel">
+    <form method="POST" action="">
+      {% csrf_token %}
+      <input type="hidden" name="question_id" value="{{ detail.id }}">
+
+      <label for="language">Language:</label>
+      <select name="language">
+        <option value="cpp">C++</option>
+        <option value="py">Python</option>
+      </select>
+
+      <div class="section">
+        <textarea name="code" class="input-box" rows="15" placeholder="Write your code here..."></textarea>
+      </div>
+
+      <div class="section">
+        <h3 style="color: #ce9178;">Custom Input</h3>
+        <textarea name="input_data" class="input-box" rows="4" placeholder="Enter custom input..."></textarea>
+      </div>
+
+      <div class="button-group">
+        <button class="btn" name="action" value="run">Run</button>
+        <button class="btn" name="action" value="submit">Submit</button>
+        <a href="#" class="btn">AI Help</a>
+      </div>
+
+      {% if results %}
+      <div class="verdict-box">
+        <strong>Verdict:</strong>
+        {% for res in results %}
+          <div>{{ res.input|truncatewords:10 }} → {{ res.passed|yesno:"✔,❌" }}</div>
+        {% endfor %}
+      </div>
+      {% endif %}
+    </form>
+  </div>
+</body>
+</html> -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{{ test_case.question.title }} | Online Judge</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #1e1e1e;  
+      color: #d4d4d4;
+      display: flex;
+      height: 100vh;
+    }
+
+    .left-panel {
+      width: 40%;
+      padding: 30px;
+      border-right: 1px solid #333;
+      overflow-y: auto;
+    }
+
+    .right-panel {
+      width: 60%;
+      padding: 30px;
+      overflow-y: auto;
+    }
+
+    h1 {
+      color: #ffffff;
+    }
+
+    .tag {
+      display: inline-block;
+      background-color: #2d2d30;
+      color: #c586c0;
+      padding: 5px 10px;
+      margin-right: 10px;
+      border-radius: 5px;
+      font-size: 14px;
+    }
+
+    .section {
+      margin: 20px 0;
+    }
+
+    .section h3 {
+      color: #4ec9b0;
+    }
+
+    .box {
+      background-color: #252526;
+      padding: 10px;
+      border-left: 4px solid #007acc;
+      white-space: pre-wrap;
+      font-family: monospace;
+      color: #dcdcaa;
+    }
+
+    .input-box {
+      background-color: #1e1e1e;
+      color: #ffffff;
+      border: 1px solid #444;
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      font-family: monospace;
+      resize: vertical;
+    }
+
+    .button-group {
+      margin-top: 15px;
+    }
+
+    .btn {
+      padding: 8px 16px;
+      margin-right: 10px;
+      background-color: #007acc;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .btn:hover {
+      background-color: #005f99;
+    }
+
+    .verdict-box {
+      margin-top: 20px;
+      padding: 10px;
+      background-color: #2a2a2a;
+      border-left: 4px solid #4ec9b0;
+    }
+
+    .test-case {
+      margin-bottom: 20px;
+      padding: 15px;
+      background-color: #252526;
+      border-radius: 5px;
+    }
+
+    .test-case.passed {
+      border-left: 4px solid #4ec9b0;
+    }
+
+    .test-case.failed {
+      border-left: 4px solid #f44747;
+    }
+
+    .test-case h4 {
+      margin-top: 0;
+      color: #9cdcfe;
+    }
+
+    .test-case pre {
+      margin: 5px 0;
+      padding: 10px;
+      background-color: #1e1e1e;
+      border-radius: 3px;
+      overflow-x: auto;
+    }
+
+    .verdict {
+      font-weight: bold;
+    }
+
+    .verdict.passed {
+      color: #4ec9b0;
+    }
+
+    .verdict.failed {
+      color: #f44747;
+    }
+
+    .score-display {
+      font-size: 1.2em;
+      margin-bottom: 15px;
+      padding: 10px;
+      background-color: #252526;
+      border-radius: 5px;
+    }
+
+    .error-message {
+      color: #f44747;
+      background-color: #2a2a2a;
+      padding: 10px;
+      border-radius: 5px;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="left-panel">
+    <h1>{{ test_case.question.title }}</h1>
+
+    <div>
+      <span class="tag">{{ test_case.topic.name }}</span>
+      <span class="tag">{{ test_case.difficulty }}</span>
+    </div>
+
+    <div class="section">
+      <h3>Description</h3>
+      <p>{{ test_case.description }}</p>
+    </div>
+
+    {% if input_content %}
+    <div class="section">
+      <h3>Sample Input</h3>
+      <div class="box">
+        {{ input_content }}
+      </div>
+    </div>
+    {% endif %}
+    
+    {% if output_content %}
+    <div class="section">
+      <h3>Sample Output</h3>
+      <div class="box">
+        {{ output_content }}
+      </div>
+    </div>
+    {% endif %}
+
+    {% if test_case.explanations %}
+    <div class="section">
+      <h3 style="color:#9cdcfe; margin-top: 10px;">Explanation</h3>
+      <div class="box">{{ test_case.explanations }}</div>
+    </div>
+    {% endif %}
+
+    {% if test_case.constraints %}
+    <div class="section">
+      <h3 style="color: #f44747;">Constraints</h3>
+      <div class="box">{{ test_case.constraints }}</div>
+    </div>
+    {% endif %}
+  </div>
+
+  <div class="right-panel">
+    <form method="POST" action="{% url 'submit_question' test_case.id %}">
+      {% csrf_token %}
+      <input type="hidden" name="question_id" value="{{ test_case.id }}">
+
+      <div class="section">
+        <label for="language">Language:</label>
+        <select name="language" id="language">
+          <option value="cpp">C++</option>
+          <option value="py">Python</option>
+        </select>
+      </div>
+
+      <div class="section">
+        <textarea name="code" class="input-box" rows="15" placeholder="Write your code here...">{% if submission %}{{ submission.code }}{% endif %}</textarea>
+      </div>
+
+      <div class="section">
+        <h3 style="color: #ce9178;">Custom Input</h3>
+        <textarea name="input_data" class="input-box" rows="4" placeholder="Enter custom input...">{% if submission %}{{ submission.input_data }}{% endif %}</textarea>
+      </div>
+
+      <div class="button-group">
+        <button class="btn" name="action" value="run">Run</button>
+        <button class="btn" name="action" value="submit">Submit</button>
+        <a href="#" class="btn">AI Help</a>
+      </div>
+
+      {% if messages %}
+        {% for message in messages %}
+          <div class="error-message">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+
+      {% if test_results %}
+      <div class="section">
+        <div class="score-display">
+          <strong>Score:</strong> {{ test_results.score|floatformat:2 }}% 
+          ({{ test_results.passed_testcases }}/{{ test_results.total_testcases }} test cases passed)
+        </div>
+
+        {% for result in test_results.results %}
+          <div class="test-case {% if result.passed %}passed{% else %}failed{% endif %}">
+            <h4>Test Case {{ forloop.counter }}{% if not result.visible %} (Hidden){% endif %}</h4>
+            
+            <div class="input">
+              <strong>Input:</strong>
+              <pre>{{ result.input }}</pre>
+            </div>
+            
+            <div class="expected">
+              <strong>Expected Output:</strong>
+              <pre>{{ result.expected }}</pre>
+            </div>
+            
+            <div class="output">
+              <strong>Your Output:</strong>
+              <pre>{{ result.output }}</pre>
+            </div>
+            
+            <div class="verdict {% if result.passed %}passed{% else %}failed{% endif %}">
+              <strong>Verdict:</strong> 
+              {% if result.passed %}✔ Passed{% else %}✖ Failed{% endif %}
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+    </form>
+  </div>
+</body>
+</html>

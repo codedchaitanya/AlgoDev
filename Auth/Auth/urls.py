@@ -19,20 +19,25 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.urls import path,include
 from sign_up.views import home
-from compile.views import submit
+from problem_detail.views import submit
+from compile.views import submit_compile
 from dashboard.views import dashboard
+from problem_detail.views import ai_help
 # from problem_detail.views import
 
 urlpatterns = [
     path('', home, name='home'),
-    path('dashboard/', dashboard, name='dashboard'),
+    path('auth/login/dashboard/', dashboard, name='dashboard'),
+    path('dashboard/problem/<int:id>', submit, name='submit'),
     # path('compile/', submit, name='submit'),
     path('compile/', include('compile.urls')),
     path('dashboard/', include('dashboard.urls')),
     path("admin/", admin.site.urls),
     path('auth/', include('sign_up.urls')),
     path('question/<int:id>/', include('problem_detail.urls')),
+    
     # path('question/<int:id>/', question_detail, name='question_detail'),
+    path('ai_help/',ai_help,name='ai_help'),
 ]
 
 # Serve media files during development

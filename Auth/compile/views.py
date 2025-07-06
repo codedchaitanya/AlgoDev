@@ -12,7 +12,7 @@ from django.contrib.auth.decorators import login_required
 # from django.views.decorators.clickjacking import xframe_options_exempt
 
 # @xframe_options_exempt
-def submit(request):
+def submit_compile(request):
     if request.method == "POST":
         # Manually fetch form data
         form = CodeSubmission(request.POST)

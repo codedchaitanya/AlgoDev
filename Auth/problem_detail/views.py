@@ -164,6 +164,9 @@ from pathlib import Path
 from django.conf import settings
 import uuid
 import os
+import google.generativeai as genai
+from dashboard.models import UserSolvedQuestion
+from django.views.decorators.csrf import csrf_exempt
 
 def run_code(language, code, input_data):
     project_path = Path(settings.BASE_DIR)
@@ -385,7 +388,7 @@ def run_testcases(submission, question, visible_only=False):
 # views.py
 def submit(request, id):
     test_case = get_object_or_404(TestCase, id=id)
-    
+    question = test_case.question
     # Get input/output content for display
     input_content = ""
     output_content = ""
@@ -398,10 +401,15 @@ def submit(request, id):
 
     if request.method == "POST":
         # Handle form submission
+        action = request.POST.get("action")
+
+        if action == "ai_help":
+            return ai_help(request,test_case)
+        
         language = request.POST.get("language")
         code = request.POST.get("code")
         input_data = request.POST.get("input_data", "")
-        action = request.POST.get("action")
+        
         
         submission = CodeSubmission(
             language=language,
@@ -413,6 +421,18 @@ def submit(request, id):
         visible_only = (action == "run")
         test_results = run_testcases(submission, test_case.question, visible_only)
         
+        if action=="submit":
+            test_results = run_testcases(submission, question, visible_only=False)
+
+        if test_results.get('score') == 100:
+                # Use get_or_create to avoid creating duplicate entries if the user
+                # resubmits a correct solution. It's an efficient and safe method.
+                UserSolvedQuestion.objects.get_or_create(
+                    user=request.user, 
+                    question=question
+                )
+        
+            
         return render(request, "question_detail.html", {
             "test_case": test_case,
             "submission": submission,
@@ -420,9 +440,176 @@ def submit(request, id):
             "input_content": input_content,
             "output_content": output_content,
         })
+        
 
     return render(request, "question_detail.html", {
         "test_case": test_case,
         "input_content": input_content,
         "output_content": output_content,
     })
+
+
+
+
+
+
+
+# In views.py
+
+# def ai_help(request, test_case):
+#     """
+#     Handles the AI help request.
+#     """
+#     language = request.POST.get("language")
+#     code = request.POST.get("code")
+
+#     # Create a submission object to run test cases
+#     submission = CodeSubmission(language=language, code=code)
+    
+#     # Run all test cases to gather data for the AI
+#     test_results = run_testcases(submission, test_case.question, visible_only=False)
+
+#     # Filter for failed test cases to send to the AI
+#     failed_tests = [res for res in test_results['results'] if not res['passed']]
+
+#     # if not failed_tests:
+#     #     # If no tests failed, there's nothing to debug
+#     #     return render(request, "question_detail.html", {
+#     #         "test_case": test_case,
+#     #         "submission": submission,
+#     #         "test_results": test_results,
+#     #         "ai_response": "All test cases passed! No need for AI help here."
+#     #     })
+
+
+#     # Configure the AI model
+#     genai.configure(api_key='AIzaSyAVyq_KhYSWEW6yj01BX443N7epGQrcy5E')
+#     model = genai.GenerativeModel('gemini-2.0-flash')
+
+#     generation_config = genai.types.GenerationConfig(
+#         max_output_tokens=200
+#     )
+    
+#     # Construct a detailed prompt for the AI
+#     prompt_parts = [
+#         f"Programming Language: {language}",
+#         f"Question Description: {test_case.description}",
+#         "User's Code:",
+#         code,
+#         "The code failed the following test cases. Please review the code, identify the bug, and provide a corrected version with an explanation.",
+#     ]
+
+#     for test in failed_tests:
+#         prompt_parts.append(f"\n--- FAILED TEST ---")
+#         prompt_parts.append(f"Input:\n{test['input']}")
+#         prompt_parts.append(f"Expected Output:\n{test['expected']}")
+#         prompt_parts.append(f"Actual Output:\n{test['output']}")
+#         prompt_parts.append("--- END TEST ---")
+
+#     prompt = "\n".join(prompt_parts)
+
+#     # Generate content
+#     try:
+#         ai_response_text = model.generate_content(prompt).text
+#     except Exception as e:
+#         ai_response_text = f"Could not get AI response. Error: {e}"
+
+#     # Render the page again with the AI response
+#     return render(request, "question_detail.html", {
+#         "test_case": test_case,
+#         "submission": submission,
+#         "test_results": test_results,
+#         "ai_response": ai_response_text,
+#     })
+
+# In views.py
+
+def ai_help(request, test_case):
+    """
+    Handles the AI help request using a structured, dynamic prompt.
+    """
+    language = request.POST.get("language")
+    code = request.POST.get("code")
+
+    submission = CodeSubmission(language=language, code=code)
+    test_results = run_testcases(submission, test_case.question, visible_only=False)
+    failed_tests = [res for res in test_results['results'] if not res['passed']]
+
+    # --- 1. Dynamically build the prompt ---
+    prompt_context = [
+        f"You are an expert AI code reviewer for an online programming judge. Your primary goal is to provide concise, structured, and helpful feedback on a user's code submission in about 200 words.",
+        f"\n**Context:**",
+        f"- **Problem:** {test_case.description}",
+        f"- **Language:** {language}",
+        f"- **User's Code:**\n``````"
+    ]
+
+    if not failed_tests:
+        prompt_context.append("- **Test Results:** All test cases passed successfully.")
+        # Instruct the AI to focus only on review
+        prompt_context.append("\n**Your Task:**\nGenerate a response focusing *only* on the 'Code Review & Suggestions' section. Omit the 'Debugging Analysis' section entirely.")
+    else:
+        failed_details = ["- **Test Results:** The code failed the following test cases:"]
+        for test in failed_tests:
+            failed_details.append(
+                f"  - **Input:** `{test['input']}`\n"
+                f"    **Expected Output:** `{test['expected']}`\n"
+                f"    **Actual Output:** `{test['output']}`"
+            )
+        prompt_context.append("\n".join(failed_details))
+        # Instruct the AI to perform all tasks
+        prompt_context.append("\n**Your Task:**\nGenerate a response with both the 'Code Review & Suggestions' and 'Debugging Analysis' sections.")
+
+    # Add the required output structure to the prompt
+    prompt_context.append(
+        "\n---\n\n"
+        "**1. Code Review & Suggestions**\n"
+        "*   **Style Analysis:**\n"
+        "*   **Improvements:**\n\n"
+        "**2. Debugging Analysis**\n"
+        "*   **[This section should only be included if test cases have failed]**\n"
+        "*   **Bug:**\n"
+        "*   **Explanation:**\n"
+        "*   **Corrected Code:**"
+    )
+
+    prompt = "\n".join(prompt_context)
+
+    # --- 2. Configure and call the AI Model ---
+    genai.configure(api_key='AIzaSyAVyq_KhYSWEW6yj01BX443N7epGQrcy5E')
+    model = genai.GenerativeModel('gemini-2.0-flash') # Or your preferred model
+    
+    generation_config = genai.types.GenerationConfig(
+        max_output_tokens=400  # Increased slightly to accommodate structure
+    )
+
+    try:
+        response = model.generate_content(
+            prompt,
+            generation_config=generation_config
+        )
+        ai_response_text = response.text
+    except Exception as e:
+        ai_response_text = f"Could not get AI response. Error: {e}"
+
+    # --- FIX: Read sample input/output content here ---
+    input_content = ""
+    output_content = ""
+    if test_case.input_file:
+        with open(test_case.input_file.path, "r") as infile:
+            input_content = infile.read()
+    if test_case.output_file:
+        with open(test_case.output_file.path, "r") as outfile:
+            output_content = outfile.read()
+    # --- 3. Render the response ---
+    return render(request, "question_detail.html", {
+        "test_case": test_case,
+        "submission": submission,
+        "test_results": test_results,
+        "ai_response": ai_response_text,
+        "input_content": input_content,
+        "output_content": output_content,
+    })
+
+
+

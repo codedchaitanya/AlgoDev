@@ -67,7 +67,7 @@ def login_user(request):
         login(request, user)
         messages.info(request, 'Login successful')
 
-        return redirect('/auth/login')
+        return redirect('dashboard/')
 
     template = loader.get_template('login.html')
     context = {}

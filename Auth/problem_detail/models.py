@@ -14,4 +14,3 @@ class TestCase(models.Model):
     
     is_visible = models.BooleanField(default=True)  # True = visible on 'Run Code'
 
-    

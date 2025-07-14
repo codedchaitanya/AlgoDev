@@ -11,7 +11,7 @@ from pathlib import Path
 from django.contrib.auth.decorators import login_required
 # from django.views.decorators.clickjacking import xframe_options_exempt
 
-# @xframe_options_exempt
+@login_required
 def submit_compile(request):
     if request.method == "POST":
         # Manually fetch form data
@@ -19,6 +19,8 @@ def submit_compile(request):
         language = request.POST.get("language")
         code = request.POST.get("code")
         input_data = request.POST.get("input_data")
+
+        
 
         # Simple validation (can add more)
         if not language or not code:
@@ -39,14 +41,14 @@ def submit_compile(request):
         submission.save()
 
         return render(request, "result.html", {"submission": submission})
-
+    selected_language = request.GET.get('lang', 'py') 
     # If GET request
     form = CodeSubmission()
     
-    return render(request, "index.html", {"form": form}) 
+    return render(request, "index.html", {"form": form,"selected_language": selected_language}) 
 
 
-# @xframe_options_exempt
+
 def run_code(language, code, input_data):
     project_path = Path(settings.BASE_DIR)
     directories = ["codes", "inputs", "outputs"]

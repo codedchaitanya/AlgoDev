@@ -1,159 +1,3 @@
-# from django.shortcuts import render, get_object_or_404
-
-# from django.http import HttpResponse
-# from django.template import loader
-# from django.shortcuts import redirect
-# from django.contrib import messages
-# from .models import TestCase
-# from compile.models import CodeSubmission
-# from compile.views import run_code
-# from django.conf import settings
-
-# from pathlib import Path
-# from django.contrib.auth.decorators import login_required
-
-
-
-# # def run_testcases(submission, question, visible_only=False):
-# #     testcases = TestCase.objects.filter(question=question)
-# #     if visible_only:
-# #         testcases = testcases.filter(is_visible=True)
-
-# #     results = []
-
-# #     for test in testcases:
-# #         with open(test.input_file.path, 'r') as f:
-# #             input_data = f.read()
-
-# #         expected_output = open(test.output_file.path, 'r').read().strip()
-
-# #         output = run_code(submission.language, submission.code, input_data).strip()
-
-# #         passed = output == expected_output
-
-# #         results.append({
-# #             'input': input_data,
-# #             'expected': expected_output,
-# #             'output': output,
-# #             'passed': passed,
-# #             'visible': test.is_visible,
-# #         })
-
-# #     return results
-
-
-# # def submit(request, id):
-# #     if request.method == "POST":
-# #         language = request.POST.get("language")
-# #         code = request.POST.get("code")
-# #         input_data = request.POST.get("input_data")
-# #         action = request.POST.get("action")
-# #         qid = request.POST.get("question_id")
-
-# #         submission = CodeSubmission(language=language, code=code, input_data=input_data)
-# #         submission.save()
-
-        
-# #         testcase = TestCase.objects.get(id=qid)
-# #         question = testcase.question
-# #         visible_only = True if action == "run" else False
-# #         results = run_testcases(submission, question, visible_only=visible_only)
-
-# #         submission.output_data = results[0]["output"]
-# #         submission.save()
-
-# #         return render(request, "question_detail.html", {
-# #             "submission": submission,
-# #             "results": results,
-# #             "detail": question  # also send question detail so it doesn't break
-# #         })
-
-# #     else:
-# #         # Handle GET request — you must return an HttpResponse
-# #         question = get_object_or_404(TestCase, id=id)
-# #         return render(request, "question_detail.html", {"detail": question})
-
-# def run_testcases(submission, question, visible_only=False):
-#     testcases = TestCase.objects.filter(question=question)
-#     if visible_only:
-#         testcases = testcases.filter(is_visible=True)
-
-#     results = []
-
-#     for test in testcases:
-#         with open(test.input_file.path, 'r') as f:
-#             input_data = f.read().strip()
-
-#         expected_output = open(test.output_file.path, 'r').read().strip()
-
-#         output = run_code(submission.language, submission.code, input_data).strip()
-
-#         passed = output == expected_output
-
-#         results.append({
-#             'input': input_data,
-#             'expected': expected_output,
-#             'output': output,
-#             'passed': passed,
-#             'visible': test.is_visible,
-#         })
-
-#     return results
-
-
-# def submit(request, id):
-#     if request.method == "POST":
-#         language = request.POST.get("language")
-#         code = request.POST.get("code")
-#         input_data = request.POST.get("input_data")
-#         action = request.POST.get("action")
-#         qid = request.POST.get("question_id")
-
-#         submission = CodeSubmission(language=language, code=code, input_data=input_data)
-#         submission.save()
-
-#         testcase = get_object_or_404(TestCase, id=qid)
-#         question = testcase.question
-
-#         visible_only = True if action == "run" else False
-#         results = run_testcases(submission, question, visible_only=visible_only)
-
-#         submission.output_data = results[0]["output"] if results else ""
-#         submission.save()
-
-#         # Read input/output text content for display (optional)
-#         input_content = ""
-#         output_content = ""
-#         if testcase.input_file and testcase.output_file:
-#             with open(testcase.input_file.path, "r") as infile:
-#                 input_content = infile.read()
-#             with open(testcase.output_file.path, "r") as outfile:
-#                 output_content = outfile.read()
-
-#         return render(request, "question_detail.html", {
-#             "submission": submission,
-#             "results": results,
-#             "detail": testcase,  # full testcase
-#             "input_content": input_content,
-#             "output_content": output_content,
-#         })
-
-#     else:
-#         testcase = get_object_or_404(TestCase, id=id)
-
-#         input_content = ""
-#         output_content = ""
-#         if testcase.input_file and testcase.output_file:
-#             with open(testcase.input_file.path, "r") as infile:
-#                 input_content = infile.read()
-#             with open(testcase.output_file.path, "r") as outfile:
-#                 output_content = outfile.read()
-
-#         return render(request, "question_detail.html", {
-#             "detail": testcase,
-#             "input_content": input_content,
-#             "output_content": output_content
-#         })
 
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
@@ -167,6 +11,12 @@ import os
 import google.generativeai as genai
 from dashboard.models import UserSolvedQuestion
 from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth.decorators import login_required
+
+from dotenv import load_dotenv
+
+# Load variables from the .env file
+load_dotenv()
 
 def run_code(language, code, input_data):
     project_path = Path(settings.BASE_DIR)
@@ -210,6 +60,10 @@ def run_code(language, code, input_data):
     try:
         if language == "cpp":
             executable_path = codes_dir / unique
+
+            if not code_file_name.endswith('.cpp'):
+                code_file_name = f"{unique}.cpp"
+                code_file_path = codes_dir / code_file_name
             # Compile
             compile_result = subprocess.run(
                 ["g++", str(code_file_path), "-o", str(executable_path)],
@@ -263,133 +117,83 @@ def run_code(language, code, input_data):
 
     return final_output
 
+
+
 def run_testcases(submission, question, visible_only=False):
-    testcases = TestCase.objects.filter(question=question)
-    if visible_only:
-        testcases = testcases.filter(is_visible=True)
+    test_case_entry = TestCase.objects.filter(question=question).first()
 
-    results = []
-    total_testcases = testcases.count()
-    passed_testcases = 0
+    if not test_case_entry:
+        return {'results': [], 'total_testcases': 0, 'passed_testcases': 0, 'score': 0}
 
-    for test in testcases:
-        try:
-            with open(test.input_file.path, 'r') as f:
-                input_data = f.read().strip()
+    all_results = []
+    
+    # --- Helper function to read and parse a pair of files ---
+    def parse_files(input_path, output_path, is_visible_flag):
+        parsed_results = []
+        if not input_path or not output_path:
+            return parsed_results
+        
+        with open(input_path, 'r') as f:
+            inputs = [i.strip() for i in f.read().split('---')]
+        with open(output_path, 'r') as f:
+            outputs = [o.strip() for o in f.read().split('---')]
+        
+        if len(inputs) != len(outputs):
+            raise Exception("Test case file mismatch.")
 
-            with open(test.output_file.path, 'r') as f:
-                expected_output = f.read().strip()
+        for i, o in zip(inputs, outputs):
+            parsed_results.append({'input': i, 'expected': o, 'visible': is_visible_flag})
+        return parsed_results
 
-            output = run_code(submission.language, submission.code, input_data).strip()
+    try:
+        # Always load the visible test cases
+        visible_cases = parse_files(test_case_entry.input_file.path, test_case_entry.output_file.path, True)
+        
+        # If it's a full submission, also load the hidden test cases
+        hidden_cases = []
+        if not visible_only and test_case_entry.hidden_input_file and test_case_entry.hidden_output_file:
+            hidden_cases = parse_files(test_case_entry.hidden_input_file.path, test_case_entry.hidden_output_file.path, False)
 
-            # Normalize line endings for comparison
-            passed = output.replace('\r\n', '\n') == expected_output.replace('\r\n', '\n')
+        # Combine the test cases for a final run
+        all_test_cases = visible_cases + hidden_cases
+        total_testcases = len(all_test_cases)
+        passed_testcases = 0
+
+        for case in all_test_cases:
+            output = run_code(submission.language, submission.code, case['input']).strip()
+            passed = output.replace('\r\n', '\n') == case['expected'].replace('\r\n', '\n')
 
             if passed:
                 passed_testcases += 1
+            
+            all_results.append({
+                'input': case['input'], 'expected': case['expected'],
+                'output': output, 'passed': passed, 'visible': case['visible']
+            })
 
-            results.append({
-                'input': input_data,
-                'expected': expected_output,
-                'output': output,
-                'passed': passed,
-                'visible': test.is_visible,
-            })
-        except Exception as e:
-            results.append({
-                'input': "Error reading test case",
-                'expected': "N/A",
-                'output': f"Error processing test case: {str(e)}",
-                'passed': False,
-                'visible': test.is_visible,
-            })
+    except Exception as e:
+        all_results.append({
+            'input': "Error processing files", 'expected': "N/A",
+            'output': f"System Error: {str(e)}", 'passed': False, 'visible': True
+        })
+        total_testcases = 1
 
     return {
-        'results': results,
+        'results': all_results,
         'total_testcases': total_testcases,
         'passed_testcases': passed_testcases,
         'score': (passed_testcases / total_testcases * 100) if total_testcases > 0 else 0
     }
 
-# def submit(request, id):
-#     if request.method == "POST":
-#         language = request.POST.get("language")
-#         code = request.POST.get("code")
-#         input_data = request.POST.get("input_data", "")
-#         action = request.POST.get("action")
-#         question_id = request.POST.get("question_id")
 
-#         if not language or not code:
-#             messages.error(request, "Language and code are required fields.")
-#             return redirect(request.META.get('HTTP_REFERER', '/'))
-
-#         # Create submission
-#         submission = CodeSubmission(
-#             language=language,
-#             code=code,
-#             input_data=input_data,
-#         )
-#         submission.save()
-
-#         question = get_object_or_404(Question, id=question_id)
-#         visible_only = (action == "run")
-        
-#         test_results = run_testcases(submission, question, visible_only=visible_only)
-
-#         # Update submission with first result's output (for display)
-#         if test_results['results']:
-#             submission.output_data = test_results['results'][0]['output']
-#             submission.save()
-
-#         # Get the first visible testcase for sample display
-#         sample_testcase = TestCase.objects.filter(
-#             question=question,
-#             is_visible=True
-#         ).first()
-
-#         input_content = ""
-#         output_content = ""
-#         if sample_testcase:
-#             with open(sample_testcase.input_file.path, "r") as infile:
-#                 input_content = infile.read()
-#             with open(sample_testcase.output_file.path, "r") as outfile:
-#                 output_content = outfile.read()
-
-#         return render(request, "question_detail.html", {
-#             "submission": submission,
-#             "test_results": test_results,
-#             "question": question,
-#             "input_content": input_content,
-#             "output_content": output_content,
-#             "action": action,
-#         })
-
-#     else:
-#         question = get_object_or_404(Question, id=id)
-#         sample_testcase = TestCase.objects.filter(
-#             question=question,
-#             is_visible=True
-#         ).first()
-
-#         input_content = ""
-#         output_content = ""
-#         if sample_testcase:
-#             with open(sample_testcase.input_file.path, "r") as infile:
-#                 input_content = infile.read()
-#             with open(sample_testcase.output_file.path, "r") as outfile:
-#                 output_content = outfile.read()
-
-#         return render(request, "question_detail.html", {
-#             "question": question,
-#             "input_content": input_content,
-#             "output_content": output_content
-#         })
-
-# views.py
+@login_required
 def submit(request, id):
+    print("--- SUBMIT VIEW CALLED ---")
     test_case = get_object_or_404(TestCase, id=id)
     question = test_case.question
-    # Get input/output content for display
+
+    # --- Prepare common context variables ---
+    # This prevents you from repeating this code in every return statement
     input_content = ""
     output_content = ""
     if test_case.input_file:
@@ -398,131 +202,87 @@ def submit(request, id):
     if test_case.output_file:
         with open(test_case.output_file.path, "r") as outfile:
             output_content = outfile.read()
+    
+    context = {
+        "test_case": test_case,
+        "input_content": input_content,
+        "output_content": output_content,
+    }
 
     if request.method == "POST":
-        # Handle form submission
-        action = request.POST.get("action")
-
-        if action == "ai_help":
-            return ai_help(request,test_case)
         
         language = request.POST.get("language")
         code = request.POST.get("code")
         input_data = request.POST.get("input_data", "")
+        action = request.POST.get("action")
         
-        
-        submission = CodeSubmission(
-            language=language,
-            code=code,
-            input_data=input_data,
-        )
-        submission.save()
 
-        visible_only = (action == "run")
-        test_results = run_testcases(submission, test_case.question, visible_only)
-        
-        if action=="submit":
+        submission = CodeSubmission(language=language, code=code, input_data=input_data)
+        context["submission"] = submission # Add submission to context for re-rendering
+
+        # --- ACTION: AI HELP ---
+        # This action needs the full context of all test cases.
+        if action == "ai_help":
+            if not code.strip():
+                    messages.error(request, "Code is empty. Please write a solution before seeking AI help.")
+                # Redirect back to the same page to show the error
+                    return redirect('submit_question', id=id)
+            return ai_help(request, test_case)
+
+        # --- ACTION: RUN CODE ---
+        # This is where the custom input logic is prioritized.
+        elif action == "run":
+            # If the user provided custom input, run ONLY that.
+            if input_data.strip():
+                output = run_code(submission.language, submission.code, input_data)
+                # Manually create a results dictionary for the template
+                # We use a new variable 'custom_run_result' to avoid confusion.
+                context["custom_run_result"] = {
+                    'input': input_data,
+                    'output': output
+                }
+            # If no custom input, run against the VISIBLE sample cases.
+            else:
+                if not code.strip():
+                    messages.error(request, "Code is empty. Please write a solution before running.")
+                # Redirect back to the same page to show the error
+                    return redirect('submit_question', id=id)
+                else:
+                    context["test_results"] = run_testcases(submission, question, visible_only=True)
+
+        # --- ACTION: SUBMIT CODE ---
+        # This action ALWAYS runs against ALL test cases and ignores custom input.
+        elif action == "submit":
+            if not code.strip():
+                messages.error(request, "Code is empty. Please write a solution before submitting.")
+                # Redirect back to the same page to show the error
+                return redirect('submit_question', id=id)
             test_results = run_testcases(submission, question, visible_only=False)
-
-        if test_results.get('score') == 100:
-                # Use get_or_create to avoid creating duplicate entries if the user
-                # resubmits a correct solution. It's an efficient and safe method.
+            context["test_results"] = test_results
+            
+            # --- NEW: Save submission results to the database ---
+            final_verdict = "Accepted" if test_results.get('score') == 100 else "Wrong Answer"
+            # Create and save a persistent record of this submission
+            CodeSubmission.objects.create(
+                user=request.user,
+                question=question,
+                language=language,
+                code=code,
+                score=test_results.get('score', 0),
+                verdict=final_verdict
+            )
+            # This is where you track the user's solved questions
+            if test_results.get('score') == 100:
                 UserSolvedQuestion.objects.get_or_create(
                     user=request.user, 
                     question=question
                 )
         
-            
-        return render(request, "question_detail.html", {
-            "test_case": test_case,
-            "submission": submission,
-            "test_results": test_results,
-            "input_content": input_content,
-            "output_content": output_content,
-        })
-        
+        return render(request, "question_detail.html", context)
 
-    return render(request, "question_detail.html", {
-        "test_case": test_case,
-        "input_content": input_content,
-        "output_content": output_content,
-    })
+    # This handles the initial GET request to the page
+    return render(request, "question_detail.html", context)
 
-
-
-
-
-
-
-# In views.py
-
-# def ai_help(request, test_case):
-#     """
-#     Handles the AI help request.
-#     """
-#     language = request.POST.get("language")
-#     code = request.POST.get("code")
-
-#     # Create a submission object to run test cases
-#     submission = CodeSubmission(language=language, code=code)
-    
-#     # Run all test cases to gather data for the AI
-#     test_results = run_testcases(submission, test_case.question, visible_only=False)
-
-#     # Filter for failed test cases to send to the AI
-#     failed_tests = [res for res in test_results['results'] if not res['passed']]
-
-#     # if not failed_tests:
-#     #     # If no tests failed, there's nothing to debug
-#     #     return render(request, "question_detail.html", {
-#     #         "test_case": test_case,
-#     #         "submission": submission,
-#     #         "test_results": test_results,
-#     #         "ai_response": "All test cases passed! No need for AI help here."
-#     #     })
-
-
-#     # Configure the AI model
-#     genai.configure(api_key='AIzaSyAVyq_KhYSWEW6yj01BX443N7epGQrcy5E')
-#     model = genai.GenerativeModel('gemini-2.0-flash')
-
-#     generation_config = genai.types.GenerationConfig(
-#         max_output_tokens=200
-#     )
-    
-#     # Construct a detailed prompt for the AI
-#     prompt_parts = [
-#         f"Programming Language: {language}",
-#         f"Question Description: {test_case.description}",
-#         "User's Code:",
-#         code,
-#         "The code failed the following test cases. Please review the code, identify the bug, and provide a corrected version with an explanation.",
-#     ]
-
-#     for test in failed_tests:
-#         prompt_parts.append(f"\n--- FAILED TEST ---")
-#         prompt_parts.append(f"Input:\n{test['input']}")
-#         prompt_parts.append(f"Expected Output:\n{test['expected']}")
-#         prompt_parts.append(f"Actual Output:\n{test['output']}")
-#         prompt_parts.append("--- END TEST ---")
-
-#     prompt = "\n".join(prompt_parts)
-
-#     # Generate content
-#     try:
-#         ai_response_text = model.generate_content(prompt).text
-#     except Exception as e:
-#         ai_response_text = f"Could not get AI response. Error: {e}"
-
-#     # Render the page again with the AI response
-#     return render(request, "question_detail.html", {
-#         "test_case": test_case,
-#         "submission": submission,
-#         "test_results": test_results,
-#         "ai_response": ai_response_text,
-#     })
-
-# In views.py
 
 def ai_help(request, test_case):
     """
@@ -530,8 +290,8 @@ def ai_help(request, test_case):
     """
     language = request.POST.get("language")
     code = request.POST.get("code")
-
-    submission = CodeSubmission(language=language, code=code)
+    input_data = request.POST.get("input_data", "")
+    submission = CodeSubmission(language=language, code=code,input_data=input_data)
     test_results = run_testcases(submission, test_case.question, visible_only=False)
     failed_tests = [res for res in test_results['results'] if not res['passed']]
 
@@ -575,8 +335,11 @@ def ai_help(request, test_case):
 
     prompt = "\n".join(prompt_context)
 
-    # --- 2. Configure and call the AI Model ---
-    genai.configure(api_key='AIzaSyAVyq_KhYSWEW6yj01BX443N7epGQrcy5E')
+   
+    my_api_key = os.getenv('GOOGLE_API_KEY')
+    
+    # Configure the model with the loaded key
+    genai.configure(api_key=my_api_key)
     model = genai.GenerativeModel('gemini-2.0-flash') # Or your preferred model
     
     generation_config = genai.types.GenerationConfig(
@@ -611,5 +374,22 @@ def ai_help(request, test_case):
         "output_content": output_content,
     })
 
+# In your problem_detail/views.py
+
+@login_required
+def submission_history_view(request, id, question_id):
+    question = get_object_or_404(Question, id=question_id)
+    
+    # Fetch all submissions by the current user for this specific question
+    submissions = CodeSubmission.objects.filter(
+        user=request.user, 
+        question=question
+    ).order_by('-submitted_at') # Show the most recent first
+
+    context = {
+        'question': question,
+        'submissions': submissions,
+    }
+    return render(request, 'submission_history.html', context)
 
 

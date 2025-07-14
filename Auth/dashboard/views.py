@@ -3,25 +3,56 @@ from .models import Question, Topic, UserSolvedQuestion
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.db.models import Count
+from django.http import HttpResponseRedirect
+from django.db.models import Q # Make sure to import Q for complex lookups
 
 
 def dashboard(request):
     topics = Topic.objects.all()
-    selected_topic_id = request.GET.get("topic")
+    search_query = request.GET.get("search", "")
+    selected_topic_id_str = request.GET.get("topic")
 
-    if selected_topic_id:
-        questions = Question.objects.filter(is_active=True, topic_id=selected_topic_id)
+    questions = Question.objects.filter(is_active=True)
+    active_topic_id = None
+
+    if search_query:
+        questions = questions.filter(
+            Q(title__icontains=search_query) 
+        )
+    elif selected_topic_id_str and selected_topic_id_str.isdigit():
+        active_topic_id = int(selected_topic_id_str)
+        questions = questions.filter(topic_id=active_topic_id)
     else:
-        # Default to "Array" topic (or any topic you want as default)
         default_topic = Topic.objects.filter(name__iexact="array").first()
-        questions = Question.objects.filter(is_active=True, topic=default_topic)
+        if default_topic:
+            questions = questions.filter(topic=default_topic)
+            active_topic_id = default_topic.id
+        else:
+            questions = questions.none()
 
+
+    # We now check if the user is actually logged in before running queries.
+    if request.user.is_authenticated:
+        # If the user is logged in, fetch their solved and favorited questions.
+        solved_question_ids = set(UserSolvedQuestion.objects.filter(user=request.user).values_list('question_id', flat=True))
+        favorited_question_ids = set(UserSolvedQuestion.objects.filter(user=request.user, is_favorite=True).values_list('question_id', flat=True))
+    else:
+        # If the user is a guest, provide empty sets so the template doesn't crash.
+        solved_question_ids = set()
+        favorited_question_ids = set()
+    
     context = {
         "topics": topics,
         "questions": questions,
-        "selected_topic_id": int(selected_topic_id) if selected_topic_id else default_topic.id,
+        "selected_topic_id": active_topic_id,
+        "solved_question_ids": solved_question_ids,
+        "favorited_question_ids": favorited_question_ids,
+        "search_query": search_query,
     }
     return render(request, "dashboard.html", context)
+
+
+
 
 def problem_detail(request, id):
     question = get_object_or_404(Question, id=id)
@@ -33,19 +64,7 @@ def problem_detail(request, id):
     }
     return render(request, 'dashboard.html', context)
 
-# @login_required
-# def toggle_favorite(request, question_id):
-#     status, _ = UserQuestionStatus.objects.get_or_create(user=request.user, question_id=question_id)
-#     status.is_favorite = not status.is_favorite
-#     status.save()
-#     return redirect("dashboard")
 
-# @login_required
-# def mark_solved(request, question_id):
-#     status, _ = UserQuestionStatus.objects.get_or_create(user=request.user, question_id=question_id)
-#     status.is_solved = True
-#     status.save()
-#     return redirect("dashboard")
 
 @login_required
 def leaderboard_view(request):
@@ -87,18 +106,6 @@ def get_user_solved_count(user):
     # The core logic: filter by the user and return the count.
     return UserSolvedQuestion.objects.filter(user=user).count()
 
-
-# In your main app's views.py
-
-
-from django.db.models import Count, Q
-
-# Assuming 'Question' and 'Topic' are in the same app's models.py
-
-
-# Import the built-in User model from Django's auth system
-
-# ... your other views like dashboard, leaderboard_view etc. ...
 
 @login_required
 def profile_view(request, username):
@@ -172,3 +179,27 @@ def profile_view(request, username):
 
     return render(request, 'profile.html', context)
 
+@login_required
+def toggle_favorite(request, question_id):
+    question = get_object_or_404(Question, id=question_id)
+    
+    # get_or_create finds the record or creates it if it doesn't exist.
+    # This is perfect because a user might favorite a question they haven't solved yet.
+    fav, created = UserSolvedQuestion.objects.get_or_create(user=request.user, question=question)
+    
+    # Toggle the is_favorite status
+    fav.is_favorite = not fav.is_favorite
+    fav.save()
+    
+    # Redirect the user back to the page they came from (the dashboard)
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
+
+@login_required
+def favorite_list_view(request):
+    # Fetch all UserSolvedQuestion objects that are marked as favorite for the current user
+    favorite_entries = UserSolvedQuestion.objects.filter(user=request.user, is_favorite=True).select_related('question')
+
+    context = {
+        'favorite_entries': favorite_entries
+    }
+    return render(request, "favorites.html", context)

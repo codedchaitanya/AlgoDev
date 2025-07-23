@@ -1,96 +1,52 @@
 # Roy'sCode - A Tech-Themed Online Code Judge
 
-Roy'sCode is a full-stack web application that provides a complete competitive programming platform, wrapped in an immersive and engaging dark horror theme. The goal was to build not just a functional code judge, but a memorable user experience backed by a professional, scalable, and secure cloud infrastructure.
+[![Python](https://img.shields.io/badge/Python-3.9-blue.svg)](https://www.python.org/)
+[![Django](https://img.shields.io/badge/Django-4.2-darkgreen.svg)](https://www.djangoproject.com/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-14-blue.svg)](https://www.postgresql.org/)
+[![Docker](https://img.shields.io/badge/Docker-24-blue.svg?logo=docker)](https://www.docker.com/)
+[![AWS](https://img.shields.io/badge/AWS-Deployed-orange.svg?logo=amazon-aws)](https://aws.amazon.com/)
+
+Roy'sCode is a full-stack web application that provides a complete competitive programming platform, wrapped in an immersive and engaging dark horror theme. It's designed to be a comprehensive and interactive learning tool, backed by a professional, scalable, and secure cloud architecture.
 
 ---
 
-### **[Website Link]:- "http://43.204.98.112:8000/"**
+### **[Website Link](http://43.204.98.112:8000/)**
 
 **Note:** The application is hosted on an AWS Free Tier EC2 instance and is not configured with a custom domain or SSL.
 
 ### Screenshot
 
-![Roy'sCode Screenshot](<img width="1905" height="918" alt="image" src="https://github.com/user-attachments/assets/ce5812ac-a1f5-4d9e-8a4c-571535e9c431" />
+![Roy'sCode Screenshot](<img width="1919" height="917" alt="image" src="https://github.com/user-attachments/assets/124e22e0-fe17-4d4e-9d22-dbc3cdc4d411" />
 )
-
 ---
 
 ## Features & Functionality
 
-Roy’sCode: A Full User-Facing Walkthrough
-Welcome to Roy’sCode, an immersive, horror-themed online code judge designed for the modern coder.
+Roy'sCode is packed with features designed to create a complete and engaging user experience from login to leaderboard.
 
-1. Home & Login
-When users arrive, they’re met with Roy’sCode’s eerie, engaging interface. Registration and login are seamless. Every user gets a personalized profile, showing their stats, favorites list, and submission history.
+### Core User Journey & Dashboard
 
-2. Dashboard: Challenge Navigation
-On the main dashboard, users see:
+*   **Personalized Experience:** Users can sign up, log in, and manage a personal profile that tracks their progress and preferences.
+*   **Interactive Dashboard:** The main hub for all challenges, featuring:
+    -   **Topic Organization:** Problems are neatly sorted into categories like Arrays, Strings, Linked Lists, Trees, Graphs, and DP.
+    -   **Difficulty Tags:** Each problem is clearly marked as Easy, Medium, or Hard.
+    -   **Powerful Search:** A search bar allows users to quickly find specific problems.
+*   **Automated Progress Tracking:** A key motivating feature. When a user successfully solves a problem, it gets an automatic **checkmark (✔)** on the dashboard, providing a clear visual of their accomplishments.
 
--Topic organization: Problems sorted into categories like Arrays, Strings, Linked List, Stack & Queue, Tree, BST, Graph, and DP.
+### The Coding Arena & Tools
 
--Difficulty tags: Each problem shows if it’s Easy, Medium, or Hard.
+*   **Integrated Solving Environment:** A clean, two-panel layout with the problem description on the left and a sleek, multi-language code editor on the right.
+*   **Instant Feedback Loop:**
+    -   **Run Code:** Test solutions against public sample cases for quick, iterative development.
+    -   **Submit:** Send the final solution for judgment against a comprehensive suite of hidden test cases.
+*   **⭐ AI-Powered Assistance:** A unique "AI Help" button is available within the problem-solving page, offering intelligent hints or starter logic to help users overcome challenging hurdles.
 
--Favorites quick access: Users can click a ★ to add problems to their favorites list.
+### Community & Utility Features
 
--Search: A search bar finds problems by name or keyword.
-
--Leaderboard: See how you stack up against other coders in real time.
-
--Auto checkmarks: When a user completely solves (accepts) a problem, it automatically gets a tick-mark, showing clear progress.
-
--Compiler: Accessible at any time for testing ideas—write and run code freely outside the problems!
-
--Profile & Logout: Profile management, account info, and instant logout are always accessible.
-
-3. Solving a Problem: The Coding Arena
-When a challenge is selected, the problem-solving page appears:
-
--Left side: Problem description, sample inputs, outputs, and tips.
-
--Right side: Code editor (supports languages like C++, Python).
-
--Run Code button: Instantly tests user code on sample cases.
-
--Submit button: Submits solution for full evaluation.
-
--AI Help button: Unique feature! Click “AI Help” to get context-aware hints or starter logic—perfect for breaking through frustration!
-
-4. Submission Page
--Every code submission is tracked:
-
--View verdicts (Accepted, Wrong Answer, Time Limit Exceeded, etc.) for each past submission.
-
--Resubmit, review, or learn from your history.
-
-5. Profile & Leaderboard
--Profile: See your solved count, favorite problems, and personal activity.
-
--Leaderboard: Compete with the community—see where you stand and climb the ranks.
-
-6. Admin Portal
--Site administrators use a secure /admin backend to:
-
--Add/edit problems, solutions, test cases
-
--Review user submissions
-
--Manage accounts and site content
-
--Roy’sCode lets you solve, experiment, climb the leaderboard, and seek AI-powered help—all in a dark, electrifying environment.
-
--Key user-visible features:
-
--Dashboard with checkmarks on completion
-
--Favorites and search
-
--Live leaderboard and profile
-
--Submission and compiler pages
-
--In-problem AI Help and instant feedback
-
-Everything updates in real time—no redeployment needed for test case uploads, admin edits, or new problems. This is your coding playground and competitive arena—all in one unique theme.
+*   **Live Leaderboard:** A competitive leaderboard to see how users rank against each other, fostering an engaging community.
+*   **Personalized Favorites List (★):** Users can star any problem to add it to a personal favorites list for easy review and practice.
+*   **Comprehensive Submission History:** A dedicated "Submissions" page where users can review the verdicts, code, and timestamps of all their past attempts.
+*   **Standalone Compiler:** A separate compiler page allows users to write and run code snippets freely, outside the context of a specific problem.
 
 ---
 
@@ -108,8 +64,9 @@ Roy'sCode is built on a modern, scalable technology stack, designed for performa
 The application is fully deployed on Amazon Web Services, using a separated architecture for robustness and security.
 
 -   **EC2 (Elastic Compute Cloud):** A virtual Linux server that acts as the secure host for our running Docker container.
--   **RDS (Relational Database Service):** A managed PostgreSQL database that lives independently from the application server. This separation ensures that all user and problem data is persistent, secure, and safely backed up.
+-   **RDS (Relational Database Service):** A managed PostgreSQL database that lives independently from the application server. This ensures that all user and problem data is persistent, secure, and safely backed up.
 -   **ECR (Elastic Container Registry):** A private Docker registry used to store and version our application images. This enables consistent and reliable deployments.
 -   **IAM & Security Groups:** A combination of a dedicated IAM user and a strict virtual firewall ensures that the application and server are only accessible through defined, secure channels.
 
 ---
+

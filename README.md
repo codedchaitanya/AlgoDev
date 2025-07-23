@@ -6,7 +6,7 @@
 [![Docker](https://img.shields.io/badge/Docker-24-blue.svg?logo=docker)](https://www.docker.com/)
 [![AWS](https://img.shields.io/badge/AWS-Deployed-orange.svg?logo=amazon-aws)](https://aws.amazon.com/)
 
-Roy'sCode is a full-stack web application that provides a complete competitive programming platform, wrapped in an immersive and engaging dark horror theme. It's designed to be a comprehensive and interactive learning tool, backed by a professional, scalable, and secure cloud architecture.
+Roy'sCode is a full-stack web application that provides a complete competitive programming platform, wrapped in an immersive and engaging Dark Tech theme. It's designed to be a comprehensive and interactive learning tool, backed by a professional, scalable, and secure cloud architecture.
 
 ---
 
@@ -56,7 +56,7 @@ Roy'sCode is built on a modern, scalable technology stack, designed for performa
 
 -   **Backend:** Django, Gunicorn
 -   **Database:** PostgreSQL
--   **Frontend:** Django Templates, HTML, CSS, JavaScript
+-   **Frontend:** Django Templates, HTML, Tailwind CSS
 -   **DevOps & Containerization:** Docker, Docker Compose
 
 ### Cloud Architecture on AWS

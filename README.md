@@ -14,8 +14,6 @@ Roy'sCode is a full-stack web application that provides a complete competitive p
 
 **Note:** The application is hosted on an AWS Free Tier EC2 instance and is not configured with a custom domain or SSL.
 
-### Screenshot
-
 ![DEMO Video](https://drive.google.com/drive/folders/1wSndazeoIzb_UPJDNI1fZTUCWGoY-n-S)
 ---
 

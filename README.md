@@ -16,8 +16,7 @@ Roy'sCode is a full-stack web application that provides a complete competitive p
 
 ### Screenshot
 
-![Roy'sCode Screenshot](<img width="1919" height="917" alt="image" src="https://github.com/user-attachments/assets/124e22e0-fe17-4d4e-9d22-dbc3cdc4d411" />
-)
+![DEMO Video](https://drive.google.com/drive/folders/1wSndazeoIzb_UPJDNI1fZTUCWGoY-n-S)
 ---
 
 ## Features & Functionality
@@ -39,7 +38,7 @@ Roy'sCode is packed with features designed to create a complete and engaging use
 *   **Instant Feedback Loop:**
     -   **Run Code:** Test solutions against public sample cases for quick, iterative development.
     -   **Submit:** Send the final solution for judgment against a comprehensive suite of hidden test cases.
-*   **⭐ AI-Powered Assistance:** A unique "AI Help" button is available within the problem-solving page, offering intelligent hints or starter logic to help users overcome challenging hurdles.
+*   **⭐ AI-Powered Assistance:** A unique "AI Help" button is available within the problem-solving page, offering intelligent style analysis and code overview and improvements along with the Debugging analysis with the corrected code if the code is buggy.
 
 ### Community & Utility Features
 

@@ -18,3 +18,6 @@ outputs/
 keys
 .vercel
 .env*
+
+# Zipped copy of media/ (not needed)
+media.zip

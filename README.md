@@ -10,11 +10,24 @@ Roy'sCode is a full-stack web application that provides a complete competitive p
 
 ---
 
-### **[Website Link](http://43.204.98.112:8000/)**
+### **[Live site: royscode.onrender.com](https://royscode.onrender.com/)** · [Demo video](https://drive.google.com/drive/folders/1wSndazeoIzb_UPJDNI1fZTUCWGoY-n-S)
 
-**Note:** The application is hosted on an AWS Free Tier EC2 instance and is not configured with a custom domain or SSL.
+**Note:** The live site runs on a free Render instance, so the first visit after a quiet spell can take a little while to wake up.
 
-[DEMO Video](https://drive.google.com/drive/folders/1wSndazeoIzb_UPJDNI1fZTUCWGoY-n-S)
+![Roy'sCode landing page](docs/screenshots/landing.jpg)
+
+---
+
+## Screenshots
+
+**Problem dashboard:** topic filters, search, difficulty tags, solved checkmarks and the star for favourites.
+
+![Problem dashboard](docs/screenshots/dashboard.jpg)
+
+**Sign-up:** players create a profile with a handle before they can solve, submit and appear on the leaderboard.
+
+![Sign-up page](docs/screenshots/sign-up.jpg)
+
 ---
 
 ## Features & Functionality
@@ -58,7 +71,7 @@ Roy'sCode is built on a modern, scalable technology stack, designed for performa
 
 ### Cloud Architecture on AWS
 
-The application is fully deployed on Amazon Web Services, using a separated architecture for robustness and security.
+The application was first deployed on Amazon Web Services, using a separated architecture for robustness and security (the public demo now runs on Render).
 
 -   **EC2 (Elastic Compute Cloud):** A virtual Linux server that acts as the secure host for our running Docker container.
 -   **RDS (Relational Database Service):** A managed PostgreSQL database that lives independently from the application server. This ensures that all user and problem data is persistent, secure, and safely backed up.

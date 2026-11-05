@@ -20,13 +20,32 @@ Roy'sCode is a full-stack web application that provides a complete competitive p
 
 ## Screenshots
 
-**Problem dashboard:** topic filters, search, difficulty tags, solved checkmarks and the star for favourites.
+**Problem dashboard:** topic filters, search, difficulty tags, a checkmark on solved problems and a star for favourites.
 
-![Problem dashboard](docs/screenshots/dashboard.jpg)
+![Problem dashboard](docs/screenshots/dashboard-solved.jpg)
 
-**Sign-up:** players create a profile with a handle before they can solve, submit and appear on the leaderboard.
+**Coding arena:** problem statement, samples and constraints on the left; language picker, editor, custom input and the **Run**, **Submit** and **AI Help** buttons on the right.
 
-![Sign-up page](docs/screenshots/sign-up.jpg)
+![Problem page with code editor](docs/screenshots/problem-editor.jpg)
+
+**Submission log:** verdict, score, language and timestamp for every attempt at a problem.
+
+![Submission log](docs/screenshots/submission-log.jpg)
+
+<table>
+<tr>
+<td width="50%"><b>Profile</b>: problems solved by difficulty, global rank and coding score<br/><img src="docs/screenshots/profile.png" alt="Profile"></td>
+<td width="50%"><b>Leaderboard</b>: the "Hall of Champions" ranking of players<br/><img src="docs/screenshots/leaderboard.jpg" alt="Leaderboard"></td>
+</tr>
+<tr>
+<td width="50%"><b>Favourites</b>: starred problems in one list<br/><img src="docs/screenshots/favourites.jpg" alt="Favourites"></td>
+<td width="50%"><b>Compiler</b>: run any snippet with custom input, outside a problem<br/><img src="docs/screenshots/compiler.jpg" alt="Standalone compiler"></td>
+</tr>
+<tr>
+<td width="50%"><b>Sign-up</b>: create a player profile<br/><img src="docs/screenshots/sign-up.jpg" alt="Sign-up"></td>
+<td width="50%"></td>
+</tr>
+</table>
 
 ---
 

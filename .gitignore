@@ -16,3 +16,5 @@ codes/
 inputs/
 outputs/
 keys
+.vercel
+.env*

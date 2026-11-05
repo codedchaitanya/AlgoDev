@@ -1,0 +1,11 @@
+env/
+docs/
+media.zip
+Dockerfile
+docker-compose.yml
+.dockerignore
+initial_data.json
+*.md
+db.sqlite3
+.env*
+.vercel

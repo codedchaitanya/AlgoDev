@@ -3,7 +3,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 from .models import  TestCase, Question
 from compile.models import CodeSubmission
-import subprocess
+from compile.runner import run_many
 from pathlib import Path
 from django.conf import settings
 import uuid
@@ -18,109 +18,20 @@ from dotenv import load_dotenv
 # Load variables from the .env file
 load_dotenv()
 
-def run_code(language, code, input_data):
-    project_path = Path(settings.BASE_DIR)
-    directories = ["codes", "inputs", "outputs"]
-
-    # Make sure the necessary directories exist
-    for directory in directories:
-        dir_path = project_path / directory
-        dir_path.mkdir(parents=True, exist_ok=True)
-
-    codes_dir = project_path / "codes"
-    inputs_dir = project_path / "inputs"
-    outputs_dir = project_path / "outputs"
-
-    unique = str(uuid.uuid4())
-
-    code_file_name = f"{unique}.{language}"
-    input_file_name = f"{unique}.txt"
-    output_file_name = f"{unique}.txt"
-
-    code_file_path = codes_dir / code_file_name
-    input_file_path = inputs_dir / input_file_name
-    output_file_path = outputs_dir / output_file_name
-
-    # Save the code to file
-    with open(code_file_path, "w") as code_file:
-        code_file.write(code)
-
-    # Normalize input line endings
-    input_data = (input_data or "").replace("\r\n", "\n")
-
-    with open(input_file_path, "w") as input_file:
-        input_file.write(input_data)
-
-    with open(output_file_path, "w") as output_file:
-        pass  # Create an empty output file
-
-    output_data = ""
-    error_data = ""
-
-    try:
-        if language == "cpp":
-            executable_path = codes_dir / unique
-
-            if not code_file_name.endswith('.cpp'):
-                code_file_name = f"{unique}.cpp"
-                code_file_path = codes_dir / code_file_name
-            # Compile
-            compile_result = subprocess.run(
-                ['/usr/bin/g++', str(code_file_path), "-o", str(executable_path)],
-                capture_output=True, text=True, timeout=5
-            )
-            if compile_result.returncode != 0:
-                error_data = compile_result.stderr
-            else:
-                # Run the program
-                run_result = subprocess.run(
-                    [str(executable_path)],
-                    stdin=open(input_file_path, "r"),
-                    stdout=subprocess.PIPE,
-                    stderr=subprocess.PIPE,
-                    text=True,
-                    timeout=5
-                )
-                
-                output_data = run_result.stdout
-
-                error_data = run_result.stderr
-
-        elif language == "py":
-            run_result = subprocess.run(
-                ["python", str(code_file_path)],
-                stdin=open(input_file_path, "r"),
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-                text=True,
-                timeout=5
-            )
-            
-            output_data = run_result.stdout
-            
-            error_data = run_result.stderr
-
-    except subprocess.TimeoutExpired:
+def format_result(result):
+    """Turn a RunResult into the text shown to the user and compared with the expected output."""
+    error_data = result.stderr
+    if result.timed_out:
         error_data = "Error: Timeout - Your code took too long to execute."
-    except Exception as e:
-        error_data = f"Error: {str(e)}"
-
-    # Clean up files
-    try:
-        os.remove(code_file_path)
-        os.remove(input_file_path)
-        if language == "cpp" and 'executable_path' in locals():
-            os.remove(executable_path)
-    except:
-        pass
-
-    # Combine output and error
-    final_output = output_data.lower().strip()
-    
+    final_output = result.stdout.strip()
     if error_data:
         final_output += "\n\nErrors:\n" + error_data.strip()
-
     return final_output
+
+
+def run_code(language, code, input_data):
+    """Run the code on one input (custom input on the problem page)."""
+    return format_result(run_many(language, code, [input_data])[0])
 
 
 
@@ -164,9 +75,12 @@ def run_testcases(submission, question, visible_only=False):
         total_testcases = len(all_test_cases)
         passed_testcases = 0
 
-        for case in all_test_cases:
-            output = run_code(submission.language, submission.code, case['input']).strip()
-            passed = output.replace('\r\n', '\n') == case['expected'].replace('\r\n', '\n')
+        # Compile once and run every test case in the same sandbox
+        runs = run_many(submission.language, submission.code, [case['input'] for case in all_test_cases])
+        for case, run in zip(all_test_cases, runs):
+            output = format_result(run).strip()
+            # Case-insensitive, so Python's True/False match true/false in the expected files
+            passed = output.replace('\r\n', '\n').lower() == case['expected'].replace('\r\n', '\n').lower()
 
             if passed:
                 passed_testcases += 1

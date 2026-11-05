@@ -4,15 +4,15 @@
 [![Django](https://img.shields.io/badge/Django-4.2-darkgreen.svg)](https://www.djangoproject.com/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-14-blue.svg)](https://www.postgresql.org/)
 [![Docker](https://img.shields.io/badge/Docker-24-blue.svg?logo=docker)](https://www.docker.com/)
-[![AWS](https://img.shields.io/badge/AWS-Deployed-orange.svg?logo=amazon-aws)](https://aws.amazon.com/)
+[![Vercel](https://img.shields.io/badge/Vercel-Live-black.svg?logo=vercel)](https://royscode-chaitanya.vercel.app/)
 
 Roy'sCode is a full-stack web application that provides a complete competitive programming platform, wrapped in an immersive and engaging Dark Tech theme. It's designed to be a comprehensive and interactive learning tool, backed by a professional, scalable, and secure cloud architecture.
 
 ---
 
-### **[Live site: royscode.onrender.com](https://royscode.onrender.com/)** · [Demo video](https://drive.google.com/drive/folders/1wSndazeoIzb_UPJDNI1fZTUCWGoY-n-S)
+### **[Live site: royscode-chaitanya.vercel.app](https://royscode-chaitanya.vercel.app/)** · [Demo video](https://drive.google.com/drive/folders/1wSndazeoIzb_UPJDNI1fZTUCWGoY-n-S)
 
-**Note:** The live site runs on a free Render instance, so the first visit after a quiet spell can take a little while to wake up.
+**Note:** Sign up to solve problems. Every Run and Submit is compiled and executed in its own Vercel Sandbox microVM, so a verdict takes a few seconds.
 
 ![Roy'sCode landing page](docs/screenshots/landing.jpg)
 
@@ -90,12 +90,19 @@ Roy'sCode is built on a modern, scalable technology stack, designed for performa
 
 ### Cloud Architecture on AWS
 
-The application was first deployed on Amazon Web Services, using a separated architecture for robustness and security (the public demo now runs on Render).
+The application was first deployed on Amazon Web Services, using a separated architecture for robustness and security (the public demo now runs on Vercel, see below).
 
 -   **EC2 (Elastic Compute Cloud):** A virtual Linux server that acts as the secure host for our running Docker container.
 -   **RDS (Relational Database Service):** A managed PostgreSQL database that lives independently from the application server. This ensures that all user and problem data is persistent, secure, and safely backed up.
 -   **ECR (Elastic Container Registry):** A private Docker registry used to store and version our application images. This enables consistent and reliable deployments.
 -   **IAM & Security Groups:** A combination of a dedicated IAM user and a strict virtual firewall ensures that the application and server are only accessible through defined, secure channels.
+
+### Live demo on Vercel
+
+-   **App:** Django runs as a Vercel Python Function (`api/index.py`, `vercel.json`); static files are served from Vercel's CDN.
+-   **Database:** Serverless PostgreSQL on Neon, connected through `DATABASE_URL`.
+-   **Code execution:** `compile/runner.py` starts a fresh Vercel Sandbox (Firecracker microVM, no network access, 1 vCPU) for each run, compiles C++ once, runs every test case with a 5 s limit, then destroys the VM. Run outside Vercel (locally or in Docker), it falls back to `g++` / `python` in a temporary folder.
+-   **Secrets:** `DJANGO_SECRET_KEY` and `GOOGLE_API_KEY` (AI Help) are read from the environment, never from code.
 
 ---
 

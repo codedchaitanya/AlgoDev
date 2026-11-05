@@ -1,0 +1,19 @@
+{
+  "builds": [
+    {
+      "src": "api/index.py",
+      "use": "@vercel/python",
+      "config": {
+        "includeFiles": [
+          "auth/**", "compile/**", "dashboard/**", "problem_detail/**", "sign_up/**",
+          "static/**", "media/**"
+        ]
+      }
+    },
+    { "src": "static/**", "use": "@vercel/static" }
+  ],
+  "routes": [
+    { "handle": "filesystem" },
+    { "src": "/(.*)", "dest": "api/index.py" }
+  ]
+}

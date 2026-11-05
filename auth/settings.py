@@ -20,12 +20,19 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-zs30)ft1lgxqc5alxvx2lvbx)vicbqsz_zwyk&upzqtf*t($(s"
+import os
+
+ON_VERCEL = os.environ.get("VERCEL") == "1"
+
+# Set DJANGO_SECRET_KEY in production; the fallback is only for local development.
+SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "django-insecure-zs30)ft1lgxqc5alxvx2lvbx)vicbqsz_zwyk&upzqtf*t($(s")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get("DJANGO_DEBUG", "0" if ON_VERCEL else "1") == "1"
 
 ALLOWED_HOSTS = ['*']
+CSRF_TRUSTED_ORIGINS = ['https://*.vercel.app', 'https://*.onrender.com']
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 
 
@@ -182,5 +189,11 @@ STORAGES = {
 
 }
 
-GOOGLE_API_KEY = os.environ.get("AIzaSyAVyq_KhYSWEW6yj01BX443N7epGQrcy5E")
+# Gemini key for the AI Help button: set GOOGLE_API_KEY in the environment, never in code.
+GOOGLE_API_KEY = os.environ.get("GOOGLE_API_KEY")
+
+# On Vercel there is no collectstatic step: WhiteNoise serves static files straight from the app folders.
+if ON_VERCEL:
+    STORAGES["staticfiles"] = {"BACKEND": "whitenoise.storage.CompressedStaticFilesStorage"}
+    WHITENOISE_USE_FINDERS = True
 
